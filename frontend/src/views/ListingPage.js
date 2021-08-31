@@ -1,15 +1,16 @@
 import {
-  Grid,
+  Button,
   Card,
   CardActionArea,
-  CardMedia,
-  Typography,
-  makeStyles,
-  Button,
-  CardContent,
   CardActions,
-} from "@material-ui/core";
-import React, { useState } from "react";
+  CardContent,
+  CardMedia,
+  Grid,
+  makeStyles,
+  Typography,
+} from '@material-ui/core';
+import React, { useState } from 'react';
+import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
 
 const useStyles = makeStyles({
   root: {
@@ -22,18 +23,27 @@ const useStyles = makeStyles({
 
 const ListingPage = () => {
   const classes = useStyles();
+  const history = useHistory();
 
   const [tracks, setTracks] = useState([
-    { name: "Shubham" },
-    { name: "Manas" },
-    { name: "Manas" },
+    { name: 'Shubham' },
+    { name: 'Manas' },
+    { name: 'Manas' },
   ]);
 
-  console.log(tracks);
-
   return (
-    <Grid container spacing={4}>
-      {tracks.map((track) => {
+    <Grid container justify="center" spacing={4} style={{ width: '100%' }}>
+      <Grid item xs={12}>
+        <Button
+          onClick={() => {
+            history.push('/building');
+          }}
+          variant="contained"
+        >
+          Build sound track
+        </Button>
+      </Grid>
+      {tracks.map(track => {
         return (
           <Grid item key={track}>
             <Card className={classes.root}>

@@ -3,8 +3,7 @@ import { Delete } from '@material-ui/icons';
 import React, { useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 
-import SitesIcon from '../images/Sites.svg';
-import UploadDocumentIcon from '../images/UploadDocumentIcon.svg';
+import UploadDocumentIcon from '../images/Upload.svg';
 
 const TDropZone = ({ setDocument }) => {
   const { acceptedFiles, getRootProps, getInputProps } = useDropzone();
@@ -22,9 +21,6 @@ const TDropZone = ({ setDocument }) => {
       justify="space-between"
       key={file}
     >
-      <Grid item>
-        <img src={SitesIcon} />
-      </Grid>
       <Grid item xs>
         <Grid item key={file.path} className="fw-semibold">
           {file.path}
@@ -65,9 +61,7 @@ const TDropZone = ({ setDocument }) => {
         </Grid>
       )}
       <Grid item xs={12}>
-        {acceptedFiles.length ? (
-          <Paper className="p-2 custom-box-small">{files}</Paper>
-        ) : null}
+        {acceptedFiles.length ? <div className="p-2">{files}</div> : null}
       </Grid>
     </Grid>
   );
