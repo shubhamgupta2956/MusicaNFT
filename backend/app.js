@@ -9,7 +9,7 @@ app.use(express.json());
 
 const audioStorage = multer.diskStorage({
     // Destination to store audio     
-    destination: 'tracks', 
+    destination: 'music', 
     filename: function (req, file, callback) {
         callback(null, file.originalname);
     }
@@ -51,17 +51,24 @@ app.post('/mergeAudio', function (req, res) {
     });
     console.log('running')
     command = command.combine('merge');
-    command = command.output('./music/'+req.body.name);
+    command = command.output('./tracks/'+req.body.name);
     command.on('error', function(err, stdout, stderr) {
         console.log('Cannot process audio: ' + err.message);
         console.log('Sox Command Stdout: ', stdout);
         console.log('Sox Command Stderr: ', stderr)
       });
     command.run();
-    db.music.push(req.body.name);
+    db.filenameNFT.push(req.body.name);
     console.log(db);
     res.send(200);
 })
+
+app.post('/getMusic', (req, res) => {
+    var options = {
+        root: path.join(__dirname)
+    }; 
+    res.sendFile('./tracks/'+req.body.name, options);
+});
 
 app.get('/getDB', (req, res) => { 
     res.send(db); 
