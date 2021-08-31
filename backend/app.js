@@ -9,7 +9,7 @@ app.use(express.json());
 
 const audioStorage = multer.diskStorage({
     // Destination to store audio     
-    destination: 'music', 
+    destination: 'track', 
     filename: function (req, file, callback) {
         callback(null, file.originalname);
     }
