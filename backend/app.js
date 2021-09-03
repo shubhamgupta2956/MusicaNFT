@@ -12,7 +12,7 @@ app.use(cors())
 
 const audioStorage = multer.diskStorage({
     // Destination to store audio     
-    destination: 'track', 
+    destination: 'tracks', 
     filename: function (req, file, callback) {
         callback(null, file.originalname);
     }
@@ -34,7 +34,8 @@ const audioUpload = multer({
 
 // For Single audio upload
 app.post('/uploadAudio', audioUpload.single('audio'), (req, res) => {
-    res.send(req.file)
+    console.log(req.file)
+    res.send(req.file);
 }, (error, req, res, next) => {
     res.status(400).send({ error: error.message })
 })
@@ -66,11 +67,11 @@ app.post('/mergeAudio', function (req, res) {
     res.send(200);
 })
 
-app.post('/getMusic', (req, res) => {
+app.get('/getMusic/:musicName', (req, res) => {
     var options = {
         root: path.join(__dirname)
     }; 
-    res.sendFile('./tracks/'+req.body.name, options);
+    res.sendFile('./tracks/'+req.params.musicName, options);
 });
 
 app.get('/getDB', (req, res) => { 

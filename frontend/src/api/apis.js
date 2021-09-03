@@ -1,4 +1,4 @@
-import { axiosInstance } from './axiosInstance';
+import { axiosInstance, axiosInstanceTemp } from './axiosInstance';
 
 function getDB() {
   return axiosInstance
@@ -36,16 +36,26 @@ function addAudio(fileName, nft) {
     });
 }
 
-function uploadAudio() {
+function getMusic(fileName) {
   return axiosInstance
-    .post('/uploadAudio')
+    .get(`/getMusic/${fileName}`)
     .then(response => {
-      const res = JSON.parse(response.request.response);
-      return res;
+      return response;
     })
     .catch(error => {
       return Promise.reject(error);
     });
 }
 
-export { addAudio, getDB, mergeAudio, uploadAudio };
+function uploadAudio(data) {
+  return axiosInstanceTemp
+    .post('/uploadAudio', data)
+    .then(response => {
+      return response.status;
+    })
+    .catch(error => {
+      return Promise.reject(error);
+    });
+}
+
+export { addAudio, getDB, getMusic, mergeAudio, uploadAudio };

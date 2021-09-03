@@ -7,3 +7,10 @@ export const axiosInstance = axios.create({
   },
   baseURL: `http://localhost:5000`,
 });
+
+export const axiosInstanceTemp = axios.create({
+  headers: {
+    'Content-Type': 'multipart/form-data',
+  },
+  baseURL: `http://localhost:5000`,
+});
