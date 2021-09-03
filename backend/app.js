@@ -4,8 +4,11 @@ const app = express()
 var SoxCommand = require('sox-audio');
 var db = require('./db');
 const multer = require('multer');
-const port = process.env.PORT || 3000
+const port = process.env.PORT || 5000
 app.use(express.json());
+var cors = require('cors')
+app.use(cors())
+
 
 const audioStorage = multer.diskStorage({
     // Destination to store audio     

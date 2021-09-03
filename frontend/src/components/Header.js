@@ -1,6 +1,8 @@
 import { Grid } from '@material-ui/core';
 import React from 'react';
 
+import logoImg from '../images/logo.png';
+
 const Header = () => {
   return (
     <Grid
@@ -15,7 +17,9 @@ const Header = () => {
         marginTop: 0,
       }}
     >
-      <Grid item>NFT-san</Grid>
+      <Grid item>
+        <img src={logoImg} style={{ height: 80 }} />
+      </Grid>
     </Grid>
   );
 };
