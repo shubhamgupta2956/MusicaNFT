@@ -42,7 +42,7 @@ export class IntellectualProperty {
   value = makeid(5);
   url = makeid(500);
   is_public = makeid(1);
-  tracks = makeid(1);
+  tracks = makeid(1000);
   constructor(
     fields:
       | {

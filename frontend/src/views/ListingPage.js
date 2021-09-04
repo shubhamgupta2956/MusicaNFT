@@ -38,7 +38,11 @@ const ListingPage = () => {
     let testTrack = [];
     track.filenameNFT.forEach(element => {
       if (element.fileName.nft) {
-        testTrack.push(element.fileName.fileName);
+        testTrack.push({
+          fileName: element.fileName.fileName,
+          nft: element.fileName.nft,
+          description: element.fileName.desc,
+        });
       }
     });
 
@@ -71,22 +75,21 @@ const ListingPage = () => {
                   />
                   <CardContent>
                     <Typography gutterBottom variant="h5" component="h2">
-                      {track}
+                      {track.fileName}
                     </Typography>
                     <Typography
                       variant="body2"
                       color="textSecondary"
                       component="p"
                     >
-                      The song “Lose Yourself” is an anecdote written by Eminem,
-                      as it describes his transition from living in a trailer
-                      park on 8 Mile in Detroit Michigan to becoming a rap
-                      superstar and signing with Dr. Dre.06-Feb-2015
+                      {track.desc}
                     </Typography>
                   </CardContent>
                 </CardActionArea>
                 <CardActions>
-                  <Button color="primary">Buy</Button>
+                  <Button color="primary" href={`/nft/${track.nft}`}>
+                    Show more info
+                  </Button>
                 </CardActions>
               </Card>
             </Grid>

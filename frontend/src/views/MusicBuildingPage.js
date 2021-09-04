@@ -37,7 +37,6 @@ import {
   program_id,
   sha256,
   stringConcat,
-  underscoreGenerator,
 } from '../ipr';
 
 const useStyles = makeStyles({
@@ -51,13 +50,10 @@ const useStyles = makeStyles({
 
 const MusicBuildingPage = () => {
   const { connection } = useConnection();
-  // console.log((connection);
 
   const [newNftAddr, setNewNftAddr] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const { publicKey, sendTransaction } = useWallet();
-
-  // console.log((publicKey);
 
   const [document, setDocument] = useState([]);
 
@@ -256,7 +252,7 @@ const MusicBuildingPage = () => {
               new TextEncoder().encode(
                 stringConcat(
                   JSON.stringify({
-                    documentHash: hash,
+                    hash: hash,
                     url: `http://localhost:5000/getMusic/${document[0].name}`,
                     tracks: JSON.stringify(document[0].tracksInfo),
                   }),
