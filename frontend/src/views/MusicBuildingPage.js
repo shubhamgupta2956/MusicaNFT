@@ -22,9 +22,15 @@ import {
   TransactionInstruction,
 } from '@solana/web3.js';
 import { Buffer } from 'buffer';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
-import { addAudio, getMusic, mergeAudio, uploadAudio } from '../api/apis';
+import {
+  addAudio,
+  getDB,
+  getMusic,
+  mergeAudio,
+  uploadAudio,
+} from '../api/apis';
 import Dropzone from '../components/Dropzone';
 import {
   IntellectualProperty_Size,
@@ -45,24 +51,36 @@ const useStyles = makeStyles({
 
 const MusicBuildingPage = () => {
   const { connection } = useConnection();
-  console.log(connection);
+  // console.log((connection);
 
   const [newNftAddr, setNewNftAddr] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const { publicKey, sendTransaction } = useWallet();
 
-  console.log(publicKey);
+  // console.log((publicKey);
 
   const [document, setDocument] = useState([]);
 
-  const [tracks, setTracks] = useState([
-    'Take Yourself',
-    'East Wind',
-    'Payphone',
-  ]);
+  const [tracks, setTracks] = useState([]);
+  const [selectedTracks, setSelectedTracks] = useState([]);
   const [songName, setSongName] = useState('');
 
-  console.log(document);
+  useEffect(async () => {
+    const track = await getDB();
+
+    let testTrack = [];
+    let testDisplayTrack = [];
+    track.filenameNFT.forEach(element => {
+      if (element.fileName.nft) {
+        testTrack.push({
+          fileName: element.fileName.fileName,
+          nft: element.fileName.nft,
+        });
+      }
+    });
+
+    setTracks(testTrack);
+  }, [newNftAddr]);
 
   const handleUploadFiles = useCallback(
     async document => {
@@ -80,17 +98,23 @@ const MusicBuildingPage = () => {
       if (!publicKey) throw new WalletNotConnectedError();
       setSubmitting(true);
 
-      console.log(musicFile);
+      const reader2 = new FileReader();
+      const fileData = new Blob([document[0]]);
+      // console.log((fileData);
+      reader2.readAsText(fileData);
 
-      const reader = new FileReader();
+      let sha256str = '';
+      reader2.onload = event => {
+        sha256str = event.target.result;
+      };
 
       let hash = '';
       if (document.length > 0) {
-        hash = await sha256(reader.readAsArrayBuffer(document[0]));
-        console.log(hash);
+        hash = await sha256(document[0].name + Math.random(3200));
+        // console.log((hash);
       }
 
-      console.log(hash);
+      // console.log((hash);
       const newAccountPubkey = await PublicKey.createWithSeed(
         publicKey,
         hash.substr(0, 10),
@@ -114,7 +138,7 @@ const MusicBuildingPage = () => {
       const transaction = new Transaction().add(instruction);
       try {
         const signature = await sendTransaction(transaction, connection);
-        console.log('created nft account');
+        // console.log(('created nft account');
         await connection.confirmTransaction(signature, 'processed');
       } catch (e) {
         console.log(
@@ -156,20 +180,140 @@ const MusicBuildingPage = () => {
         const signature2 = await sendTransaction(transaction2, connection);
         await connection.confirmTransaction(signature2, 'processed');
       } catch (e) {
-        console.log(`/#/nft/${newAccountPubkey.toBase58()}`);
+        // console.log((`/#/nft/${newAccountPubkey.toBase58()}`);
         return;
       }
 
       setNewNftAddr(newAccountPubkey.toBase58());
       setSubmitting(false);
 
-      addAudio({ fileName: document[0].name, nft: newAccountPubkey });
+      addAudio({
+        fileName: document[0].name,
+        nft: newAccountPubkey.toBase58(),
+      });
+    },
+    [publicKey, sendTransaction, connection]
+  );
+
+  const handleUploadFilesWithoutFile = useCallback(
+    async document => {
+      if (!publicKey) throw new WalletNotConnectedError();
+      setSubmitting(true);
+
+      let hash = '';
+      if (document.length > 0) {
+        hash = await sha256(document[0].name + Math.random(3200));
+      }
+
+      // console.log((hash);
+      const newAccountPubkey = await PublicKey.createWithSeed(
+        publicKey,
+        hash.substr(0, 10),
+        program_id
+      );
+
+      const lamports = await connection.getMinimumBalanceForRentExemption(
+        IntellectualProperty_Size
+      );
+
+      const instruction = SystemProgram.createAccountWithSeed({
+        fromPubkey: publicKey,
+        basePubkey: publicKey,
+        seed: hash.substr(0, 10),
+        newAccountPubkey: newAccountPubkey,
+        lamports: lamports,
+        space: IntellectualProperty_Size,
+        programId: program_id,
+      });
+
+      const transaction = new Transaction().add(instruction);
+      try {
+        const signature = await sendTransaction(transaction, connection);
+        // console.log(('created nft account');
+        await connection.confirmTransaction(signature, 'processed');
+      } catch (e) {
+        console.log(
+          "Same idea made by you already exists. Visit{' '}",
+          `/#/nft/${newAccountPubkey.toBase58()}`
+        );
+        return;
+      }
+
+      const initAccount = new TransactionInstruction({
+        programId: program_id,
+        keys: [
+          { pubkey: newAccountPubkey, isSigner: false, isWritable: true },
+          {
+            pubkey: publicKey,
+            isSigner: true,
+            isWritable: false,
+          },
+        ],
+        data: Buffer.from(
+          Uint8Array.of(
+            1,
+            ...Array.from(
+              new TextEncoder().encode(
+                stringConcat(
+                  JSON.stringify({
+                    documentHash: hash,
+                    url: `http://localhost:5000/getMusic/${document[0].name}`,
+                    tracks: document[0].tracksInfo,
+                  }),
+                  500
+                )
+              )
+            )
+          )
+        ),
+      });
+      const transaction2 = new Transaction().add(initAccount);
+      try {
+        const signature2 = await sendTransaction(transaction2, connection);
+        await connection.confirmTransaction(signature2, 'processed');
+      } catch (e) {
+        // console.log((`/#/nft/${newAccountPubkey.toBase58()}`);
+        return;
+      }
+
+      setNewNftAddr(newAccountPubkey.toBase58());
+      setSubmitting(false);
+
+      addAudio({
+        fileName: document[0].name,
+        nft: newAccountPubkey.toBase58(),
+      });
     },
     [publicKey, sendTransaction, connection]
   );
 
   const handleMergeAudio = () => {
-    mergeAudio(tracks, songName);
+    let temp = [];
+    let tracksInfo = [];
+
+    for (let track in selectedTracks) {
+      temp.push(selectedTracks[track].fileName);
+      tracksInfo.push({
+        name: selectedTracks[track].fileName,
+        token: selectedTracks[track].nft,
+        owner: '',
+        contribution: '',
+      });
+    }
+
+    mergeAudio(temp, songName);
+    setTimeout(async () => {
+      const musicFile = await getMusic(songName);
+
+      handleUploadFilesWithoutFile([
+        { name: songName, tracksInfo: tracksInfo },
+      ]);
+
+      addAudio({
+        fileName: songName,
+        nft: newNftAddr,
+      });
+    }, 2000);
   };
 
   return (
@@ -210,7 +354,8 @@ const MusicBuildingPage = () => {
                 multiple
                 id="tags-outlined"
                 options={tracks}
-                getOptionLabel={option => option}
+                getOptionLabel={option => option.fileName}
+                onChange={(event, value) => setSelectedTracks(value)}
                 filterSelectedOptions
                 renderInput={params => (
                   <TextField
