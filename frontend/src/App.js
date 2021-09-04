@@ -22,6 +22,7 @@ import logo from './logo.svg';
 import ListingPage from './views/ListingPage';
 import LoginPage from './views/LoginPage';
 import MusicBuildingPage from './views/MusicBuildingPage';
+import NFTPage from './views/NFTPage';
 
 function App() {
   const wallets = useMemo(
@@ -49,6 +50,7 @@ function App() {
                   <Route exact path="/" component={LoginPage} />
                   <Route exact path="/listing" component={ListingPage} />
                   <Route exact path="/building" component={MusicBuildingPage} />
+                  <Route exact path="/nft/:addr" component={NFTPage} />
                 </Switch>
               </div>
             </Router>

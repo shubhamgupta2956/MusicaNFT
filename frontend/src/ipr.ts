@@ -40,18 +40,18 @@ export class IntellectualProperty {
   property_owner = makeid(44);
   hash = makeid(64);
   value = makeid(5);
-  uri = makeid(500);
+  url = makeid(500);
   is_public = makeid(1);
-  for_sale = makeid(1);
+  tracks = makeid(1);
   constructor(
     fields:
       | {
           property_owner: string;
           hash: string;
           value: string;
-          uri: string;
+          url: string;
           is_public: string;
-          for_sale: string;
+          tracks: string;
         }
       | undefined = undefined
   ) {
@@ -59,9 +59,9 @@ export class IntellectualProperty {
       this.property_owner = fields.property_owner;
       this.hash = fields.hash;
       this.value = fields.value;
-      this.uri = fields.uri;
+      this.url = fields.url;
       this.is_public = fields.is_public;
-      this.for_sale = fields.for_sale;
+      this.tracks = fields.tracks;
     }
   }
 }
@@ -69,7 +69,7 @@ export class IntellectualProperty {
 export function parseIntellectualProperty(
   property: IntellectualProperty
 ): IntellectualProperty {
-  property.uri = stringParser(property.uri);
+  property.url = stringParser(property.url);
   property.value = stringParser(property.value);
   return property;
 }
@@ -83,9 +83,9 @@ export const IntellectualPropertySchema = new Map([
         ['property_owner', 'string'],
         ['hash', 'string'],
         ['value', 'string'],
-        ['uri', 'string'],
+        ['url', 'string'],
         ['is_public', 'string'],
-        ['for_sale', 'string'],
+        ['tracks', 'string'],
       ],
     },
   ],

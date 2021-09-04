@@ -258,7 +258,7 @@ const MusicBuildingPage = () => {
                   JSON.stringify({
                     documentHash: hash,
                     url: `http://localhost:5000/getMusic/${document[0].name}`,
-                    tracks: document[0].tracksInfo,
+                    tracks: JSON.stringify(document[0].tracksInfo),
                   }),
                   500
                 )
