@@ -115,6 +115,7 @@ const NFTPage = () => {
     }
   }, [realData]);
 
+  console.log(realData);
   const handleBuyNFT = async () => {
     const transaction = new Transaction().add(
       SystemProgram.transfer({
@@ -138,7 +139,7 @@ const NFTPage = () => {
         SystemProgram.transfer({
           fromPubkey: publicKey,
           toPubkey: ownerPublicKey,
-          lamports: LAMPORTS_PER_SOL / 100,
+          lamports: (LAMPORTS_PER_SOL * 50) / trackOwners.size,
         })
       );
 
