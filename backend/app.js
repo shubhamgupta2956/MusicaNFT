@@ -21,7 +21,7 @@ const audioStorage = multer.diskStorage({
 const audioUpload = multer({
     storage: audioStorage,
     limits: {
-      fileSize: 100000000 // 1000000 Bytes = 1 MB
+      fileSize: 200000000 // 1000000 Bytes = 1 MB
     },
     //fileFilter(req, file, cb) {
     //   if (!file.originalname.match(/\.(png|jpg)$/)) { 

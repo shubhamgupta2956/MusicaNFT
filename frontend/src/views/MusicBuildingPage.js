@@ -6,12 +6,15 @@ import {
   CardContent,
   CardMedia,
   Chip,
+  Divider,
   Grid,
+  IconButton,
   makeStyles,
   Paper,
   TextField,
   Typography,
 } from '@material-ui/core';
+import { ArrowBack } from '@material-ui/icons';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import { WalletNotConnectedError } from '@solana/wallet-adapter-base';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
@@ -85,7 +88,7 @@ const MusicBuildingPage = () => {
 
   const handleUploadFiles = useCallback(
     async (document, descUpload) => {
-      setLoading(true)
+      setLoading(true);
       const form = new FormData();
 
       form.append('audio', document[0], document[0].name);
@@ -197,14 +200,14 @@ const MusicBuildingPage = () => {
         desc: descUpload,
         nft: newAccountPubkey.toBase58(),
       });
-      setLoading(false)
+      setLoading(false);
     },
     [publicKey, sendTransaction, connection]
   );
   console.log(descUpload);
 
   const handleUploadFilesWithoutFile = useCallback(
-    async document => {
+    async (document, desc) => {
       if (!publicKey) throw new WalletNotConnectedError();
       setSubmitting(true);
 
@@ -288,6 +291,8 @@ const MusicBuildingPage = () => {
       setNewNftAddr(newAccountPubkey.toBase58());
       setSubmitting(false);
 
+      console.log(desc);
+
       addAudio({
         fileName: document[0].name,
         desc: desc,
@@ -297,7 +302,7 @@ const MusicBuildingPage = () => {
     [publicKey, sendTransaction, connection]
   );
 
-  const handleMergeAudio = (desc) => {
+  const handleMergeAudio = desc => {
     let temp = [];
     let tracksInfo = [];
 
@@ -315,9 +320,10 @@ const MusicBuildingPage = () => {
     setTimeout(async () => {
       const musicFile = await getMusic(songName);
 
-      handleUploadFilesWithoutFile([
-        { name: songName, tracksInfo: tracksInfo },
-      ]);
+      handleUploadFilesWithoutFile(
+        [{ name: songName, tracksInfo: tracksInfo }],
+        desc
+      );
 
       addAudio({
         fileName: songName,
@@ -337,13 +343,18 @@ const MusicBuildingPage = () => {
           <Grid container spacing={4} justify="center">
             <Grid item xs={12}>
               <Button
+                style={{ float: 'left' }}
                 onClick={() => {
                   history.push('/');
                 }}
                 color="primary"
-                variant="contained"
+                variant="text"
+                size="small"
               >
-                Listing
+                <IconButton>
+                  <ArrowBack color="primary" />
+                </IconButton>
+                Go Back
               </Button>
             </Grid>
             <Grid item className="custom-box" xs={9} style={{ marginTop: 24 }}>
@@ -374,10 +385,19 @@ const MusicBuildingPage = () => {
                 Upload
               </Button>
             </Grid>
+            <Grid item xs={12} style={{ margin: 25 }} container>
+              <Grid item xs={5}>
+                <Divider />
+              </Grid>
+              <Grid item xs={2}>
+                OR
+              </Grid>
+              <Grid item xs={5}>
+                <Divider />
+              </Grid>
+            </Grid>
             <Grid item xs={12}>
-              <Typography style={{ marginTop: 100 }} variant="h4">
-                Build Song
-              </Typography>
+              <Typography variant="h4">Build Song</Typography>
             </Grid>
             <Grid item xs={9}>
               <Autocomplete
