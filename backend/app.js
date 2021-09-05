@@ -42,7 +42,7 @@ app.post('/uploadAudio', audioUpload.single('audio'), (req, res) => {
 
 app.post('/addAudio', function (req, res) {
     // console.log((req.body);
-    db.filenameNFT.push({fileName : req.body.fileName, desc: req.body.desc, NFT : req.body.NFT});
+    db.filenameNFT.push({fileName : req.body.fileName, desc: req.body.desc, img: req.body.img, NFT : req.body.NFT});
     // console.log((db);
     res.send(200)
 })

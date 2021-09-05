@@ -1,4 +1,4 @@
-import { Button, Grid, Paper } from '@material-ui/core';
+import { Button, Divider, Grid, Paper, Typography } from '@material-ui/core';
 import * as splToken from '@solana/spl-token';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import {
@@ -12,6 +12,11 @@ import {
 import React, { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
+import DownloadImg from '../images/download.jpeg';
+import Download1Img from '../images/download1.jpeg';
+import Download2Img from '../images/download2.jpeg';
+import Download3Img from '../images/download3.jpeg';
+import Download4Img from '../images/download4.jpeg';
 import {
   IntellectualProperty,
   IntellectualPropertySchema,
@@ -20,6 +25,14 @@ import {
   stringConcat,
   stringParser,
 } from '../ipr';
+
+const imageList = [
+  Download1Img,
+  Download2Img,
+  Download3Img,
+  Download4Img,
+  DownloadImg,
+];
 
 const NFTPage = () => {
   const { addr, desc, name } = useParams();
@@ -152,11 +165,24 @@ const NFTPage = () => {
         return;
       }
     }
-  };
 
+    window.open(`http://localhost:5000/getMusic/${name}`);
+  };
+  console.log(trackOwners);
   return (
     <Grid container spacing={4} alignItems="flex-start" justifyContent="center">
-      <Grid item xs={4}>
+      <Grid item xs={12}>
+        <Button
+          style={{ float: 'right' }}
+          variant="contained"
+          color="primary"
+          onClick={() => handleBuyNFT()}
+        >
+          Buy Song
+        </Button>
+      </Grid>
+
+      <Grid item xs={6}>
         <Paper style={{ padding: '16px' }}>
           <Grid
             container
@@ -165,45 +191,55 @@ const NFTPage = () => {
             alignItems="flex-start"
           >
             <Grid item>
+              <img
+                style={{ height: 250, width: '100%', objectFit: 'fill' }}
+                src={imageList[Math.floor(Math.random(1) * 5)]}
+              />
+            </Grid>
+            <Grid item>
               <strong>Track name:</strong> {name}
             </Grid>
             <Grid item>
               <strong>Description:</strong> {desc}
             </Grid>
+            <Grid item>
+              <strong>NFT Token:</strong> {addr}
+            </Grid>
           </Grid>
         </Paper>
       </Grid>
-      <Grid item container xs={8} spacing={4} direction="column">
-        {realData?.tracks?.map(track => {
-          return (
-            <Grid item key={track.token}>
-              <Paper style={{ padding: '16px' }}>
-                <Grid
-                  container
-                  direction="column"
-                  spacing={2}
-                  alignItems="flex-start"
-                >
-                  <Grid item>
-                    <strong>Track name:</strong> {track.name}
-                  </Grid>
-                  <Grid item>
-                    <strong>NFT Token:</strong> {track.token}
-                  </Grid>
-                </Grid>
-              </Paper>
+      <Grid item container xs={6} direction="column">
+        <Paper style={{ padding: '16px' }}>
+          <Grid container spacing={4}>
+            <Grid item>
+              <Typography variant="h5">Linked Songs</Typography>
             </Grid>
-          );
-        })}
-      </Grid>
-      <Grid item>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => handleBuyNFT()}
-        >
-          Buy Song
-        </Button>
+            {realData?.tracks?.map(track => {
+              return (
+                <>
+                  <Grid
+                    item
+                    key={track}
+                    container
+                    spacing={1}
+                    direction="column"
+                    alignItems="flex-start"
+                  >
+                    <Grid item>
+                      <strong>Track name:</strong> {track.name}
+                    </Grid>
+                    <Grid item>
+                      <strong>NFT Token:</strong> {track.token}
+                    </Grid>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Divider style={{ width: '100%' }} />
+                  </Grid>
+                </>
+              );
+            })}
+          </Grid>
+        </Paper>
       </Grid>
     </Grid>
   );

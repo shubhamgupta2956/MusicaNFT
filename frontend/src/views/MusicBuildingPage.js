@@ -63,6 +63,7 @@ const MusicBuildingPage = () => {
 
   const [tracks, setTracks] = useState([]);
   const [selectedTracks, setSelectedTracks] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [songName, setSongName] = useState('');
 
   useEffect(async () => {
@@ -84,6 +85,7 @@ const MusicBuildingPage = () => {
 
   const handleUploadFiles = useCallback(
     async (document, descUpload) => {
+      setLoading(true)
       const form = new FormData();
 
       form.append('audio', document[0], document[0].name);
@@ -195,6 +197,7 @@ const MusicBuildingPage = () => {
         desc: descUpload,
         nft: newAccountPubkey.toBase58(),
       });
+      setLoading(false)
     },
     [publicKey, sendTransaction, connection]
   );
@@ -416,6 +419,7 @@ const MusicBuildingPage = () => {
               <Button
                 onClick={() => handleMergeAudio(desc)}
                 variant="contained"
+                isLoading={loading}
                 color="primary"
               >
                 Make song

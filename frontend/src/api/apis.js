@@ -16,8 +16,8 @@ function mergeAudio(tracks, songName) {
   return axiosInstance
     .post('/mergeAudio', { tracks: tracks, name: songName })
     .then(response => {
-      const res = JSON.parse(response.request.response);
-      return res;
+      // const res = JSON.parse(response.request.response);
+      return response;
     })
     .catch(error => {
       return Promise.reject(error);
