@@ -47,10 +47,14 @@ function App() {
               <Header />
               <div style={{ width: '70vw', margin: 'auto', marginTop: 32 }}>
                 <Switch>
-                  <Route exact path="/" component={LoginPage} />
-                  <Route exact path="/listing" component={ListingPage} />
+                  {/* <Route exact path="/" component={LoginPage} /> */}
+                  <Route exact path="/" component={ListingPage} />
                   <Route exact path="/building" component={MusicBuildingPage} />
-                  <Route exact path="/nft/:addr" component={NFTPage} />
+                  <Route
+                    exact
+                    path="/nft/:addr/:name/:desc"
+                    component={NFTPage}
+                  />
                 </Switch>
               </div>
             </Router>

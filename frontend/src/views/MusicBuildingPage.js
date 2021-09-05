@@ -23,6 +23,7 @@ import {
 } from '@solana/web3.js';
 import { Buffer } from 'buffer';
 import React, { useCallback, useEffect, useState } from 'react';
+import { useHistory } from 'react-router-dom';
 
 import {
   addAudio,
@@ -50,8 +51,11 @@ const useStyles = makeStyles({
 
 const MusicBuildingPage = () => {
   const { connection } = useConnection();
+  const history = useHistory();
 
   const [newNftAddr, setNewNftAddr] = useState(null);
+  const [desc, setDesc] = useState('');
+  const [descUpload, setDescUpload] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const { publicKey, sendTransaction } = useWallet();
 
@@ -79,7 +83,7 @@ const MusicBuildingPage = () => {
   }, [newNftAddr]);
 
   const handleUploadFiles = useCallback(
-    async document => {
+    async (document, descUpload) => {
       const form = new FormData();
 
       form.append('audio', document[0], document[0].name);
@@ -163,6 +167,8 @@ const MusicBuildingPage = () => {
                   JSON.stringify({
                     documentHash: hash,
                     url: `http://localhost:5000/getMusic/${document[0].name}`,
+                    totalPrice: '',
+                    owner: publicKey,
                   }),
                   500
                 )
@@ -183,13 +189,16 @@ const MusicBuildingPage = () => {
       setNewNftAddr(newAccountPubkey.toBase58());
       setSubmitting(false);
 
+      console.log(descUpload);
       addAudio({
         fileName: document[0].name,
+        desc: descUpload,
         nft: newAccountPubkey.toBase58(),
       });
     },
     [publicKey, sendTransaction, connection]
   );
+  console.log(descUpload);
 
   const handleUploadFilesWithoutFile = useCallback(
     async document => {
@@ -254,7 +263,8 @@ const MusicBuildingPage = () => {
                   JSON.stringify({
                     hash: hash,
                     url: `http://localhost:5000/getMusic/${document[0].name}`,
-                    tracks: JSON.stringify(document[0].tracksInfo),
+                    tracks: document[0].tracksInfo,
+                    owner: publicKey.toBase58(),
                   }),
                   500
                 )
@@ -277,13 +287,14 @@ const MusicBuildingPage = () => {
 
       addAudio({
         fileName: document[0].name,
+        desc: desc,
         nft: newAccountPubkey.toBase58(),
       });
     },
     [publicKey, sendTransaction, connection]
   );
 
-  const handleMergeAudio = () => {
+  const handleMergeAudio = (desc) => {
     let temp = [];
     let tracksInfo = [];
 
@@ -307,6 +318,7 @@ const MusicBuildingPage = () => {
 
       addAudio({
         fileName: songName,
+        desc: desc,
         nft: newNftAddr,
       });
     }, 2000);
@@ -320,6 +332,17 @@ const MusicBuildingPage = () => {
           elevation={0}
         >
           <Grid container spacing={4} justify="center">
+            <Grid item xs={12}>
+              <Button
+                onClick={() => {
+                  history.push('/');
+                }}
+                color="primary"
+                variant="contained"
+              >
+                Listing
+              </Button>
+            </Grid>
             <Grid item className="custom-box" xs={9} style={{ marginTop: 24 }}>
               <Dropzone setDocument={setDocument} />
             </Grid>
@@ -330,10 +353,18 @@ const MusicBuildingPage = () => {
                 </div>
               </Grid>
             )}
-
+            <Grid item xs={9}>
+              <TextField
+                value={descUpload}
+                variant="outlined"
+                label="Description"
+                fullWidth
+                onChange={e => setDescUpload(e.target.value)}
+              />
+            </Grid>
             <Grid item xs={12}>
               <Button
-                onClick={() => handleUploadFiles(document)}
+                onClick={() => handleUploadFiles(document, descUpload)}
                 variant="contained"
                 color="primary"
               >
@@ -372,9 +403,18 @@ const MusicBuildingPage = () => {
                 onChange={e => setSongName(e.target.value)}
               />
             </Grid>
+            <Grid item xs={9}>
+              <TextField
+                value={desc}
+                variant="outlined"
+                label="Description"
+                fullWidth
+                onChange={e => setDesc(e.target.value)}
+              />
+            </Grid>
             <Grid item xs={12}>
               <Button
-                onClick={() => handleMergeAudio()}
+                onClick={() => handleMergeAudio(desc)}
                 variant="contained"
                 color="primary"
               >

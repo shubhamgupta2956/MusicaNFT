@@ -1,8 +1,11 @@
 import { Button, Grid, Paper } from '@material-ui/core';
-import splToken from '@solana/spl-token';
+import * as splToken from '@solana/spl-token';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import {
+  LAMPORTS_PER_SOL,
   PublicKey,
+  sendAndConfirmTransaction,
+  SystemProgram,
   Transaction,
   TransactionInstruction,
 } from '@solana/web3.js';
@@ -19,14 +22,52 @@ import {
 } from '../ipr';
 
 const NFTPage = () => {
-  const { addr } = useParams();
+  const { addr, desc, name } = useParams();
   const [nftDetails, setNftDetails] = useState(null);
   const { publicKey, sendTransaction } = useWallet();
   const { connection } = useConnection();
   const [realData, setRealData] = useState({});
+  const [owner, setOwner] = useState('');
+  const [trackOwners, setTrackOwners] = useState(new Set());
+
   const [realName, setRealName] = useState('');
 
-  console.log(realData);
+  const getDataFromNFT = async address => {
+    const greetedPubkey = new PublicKey(address);
+    const accountInfo = await connection.getAccountInfo(greetedPubkey);
+    if (accountInfo === null) {
+      return;
+    }
+    var string = new TextDecoder().decode(accountInfo.data);
+
+    let test = string.substring(string.indexOf('{') + 1).split('__')[0];
+
+    const property = JSON.parse('{' + test);
+
+    return property.tracks;
+  };
+
+  const getAllNodes = async () => {
+    let finalTracks = [];
+    const nftTokens = new Set();
+    let tracksArr = [...realData.tracks];
+
+    for (let track in tracksArr) {
+      nftTokens.add(tracksArr[track].token);
+
+      const tracksData = await getDataFromNFT(tracksArr[track].token);
+
+      for (let i in tracksData) {
+        finalTracks.push(tracksData[i]);
+        tracksArr.push(tracksData[i]);
+      }
+    }
+
+    for (let track in finalTracks) {
+      nftTokens.add(finalTracks[track].token);
+    }
+    setTrackOwners(nftTokens);
+  };
 
   useEffect(async () => {
     const greetedPubkey = new PublicKey(addr);
@@ -41,7 +82,11 @@ const NFTPage = () => {
 
     const property = JSON.parse('{' + test);
 
-    setRealData(property);
+    if (!realData.url) {
+      setRealData(property);
+    }
+
+    setOwner(accountInfo.owner);
 
     const parsedData = stringParser(property.url);
     const isPublic = property.is_public === '1';
@@ -62,25 +107,73 @@ const NFTPage = () => {
         ? property.hash === (await sha256(JSON.parse(parsedData).description))
         : false,
     });
-  }, [addr, connection]);
+  }, [addr]);
 
-  const handleBuyNFT = () => {
-    // var transaction = new Transaction().add(
-    //   splToken.Token.createTransferInstruction(
-    //     program_id,
-    //     realData.owner,
-    //     toTokenAccount.address,
-    //     fromWallet.publicKey,
-    //     [],
-    //     1
-    //   )
-    // );
+  useEffect(async () => {
+    if (realData?.tracks) {
+      await getAllNodes();
+    }
+  }, [realData]);
+
+  const handleBuyNFT = async () => {
+    const transaction = new Transaction().add(
+      SystemProgram.transfer({
+        fromPubkey: publicKey,
+        toPubkey: owner,
+        lamports: 0 / 100,
+      })
+    );
+
+    try {
+      const signature = await sendTransaction(transaction, connection);
+      await connection.confirmTransaction(signature, 'processed');
+      console.log('transaction successful');
+    } catch (e) {
+      console.log("Same idea made by you already exists. Visit{' '}");
+      return;
+    }
+    for (let owner of trackOwners) {
+      const ownerPublicKey = new PublicKey(owner);
+      const transaction2 = new Transaction().add(
+        SystemProgram.transfer({
+          fromPubkey: publicKey,
+          toPubkey: ownerPublicKey,
+          lamports: LAMPORTS_PER_SOL / 100,
+        })
+      );
+
+      try {
+        const signature = await sendTransaction(transaction2, connection);
+        await connection.confirmTransaction(signature, 'processed');
+        console.log('transaction successful');
+      } catch (e) {
+        console.log("Same idea made by you already exists. Visit{' '}");
+        return;
+      }
+    }
   };
 
   return (
-    <Grid container spacing={4} alignItems="center">
-      <Grid item container spacing={4} direction="column">
-        {realData.tracks.map(track => {
+    <Grid container spacing={4} alignItems="flex-start" justifyContent="center">
+      <Grid item xs={4}>
+        <Paper style={{ padding: '16px' }}>
+          <Grid
+            container
+            direction="column"
+            spacing={2}
+            alignItems="flex-start"
+          >
+            <Grid item>
+              <strong>Track name:</strong> {name}
+            </Grid>
+            <Grid item>
+              <strong>Description:</strong> {desc}
+            </Grid>
+          </Grid>
+        </Paper>
+      </Grid>
+      <Grid item container xs={8} spacing={4} direction="column">
+        {realData?.tracks?.map(track => {
           return (
             <Grid item key={track.token}>
               <Paper style={{ padding: '16px' }}>
@@ -108,7 +201,7 @@ const NFTPage = () => {
           color="primary"
           onClick={() => handleBuyNFT()}
         >
-          Buy
+          Buy Song
         </Button>
       </Grid>
     </Grid>

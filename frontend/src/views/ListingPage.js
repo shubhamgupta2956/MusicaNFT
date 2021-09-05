@@ -41,7 +41,7 @@ const ListingPage = () => {
         testTrack.push({
           fileName: element.fileName.fileName,
           nft: element.fileName.nft,
-          description: element.fileName.desc,
+          description: element.fileName.desc ? element.fileName.desc : 'null',
         });
       }
     });
@@ -82,12 +82,15 @@ const ListingPage = () => {
                       color="textSecondary"
                       component="p"
                     >
-                      {track.desc}
+                      {track.description === 'null' ? '' : track.description}
                     </Typography>
                   </CardContent>
                 </CardActionArea>
                 <CardActions>
-                  <Button color="primary" href={`/nft/${track.nft}`}>
+                  <Button
+                    color="primary"
+                    href={`/nft/${track.nft}/${track.fileName}/${track.description}`}
+                  >
                     Show more info
                   </Button>
                 </CardActions>
