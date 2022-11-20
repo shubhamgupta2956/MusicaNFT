@@ -20,6 +20,8 @@ import {
 
 const NFTPage = () => {
   const { addr } = useParams();
+  const { connection } = useConnection();
+
   const [nftDetails, setNftDetails] = useState(null);
   const { publicKey, sendTransaction } = useWallet();
   const { connection } = useConnection();
@@ -65,16 +67,16 @@ const NFTPage = () => {
   }, [addr, connection]);
 
   const handleBuyNFT = () => {
-    // var transaction = new Transaction().add(
-    //   splToken.Token.createTransferInstruction(
-    //     program_id,
-    //     realData.owner,
-    //     toTokenAccount.address,
-    //     fromWallet.publicKey,
-    //     [],
-    //     1
-    //   )
-    // );
+    var transaction = new Transaction().add(
+      splToken.Token.createTransferInstruction(
+        program_id,
+        realData.owner,
+        toTokenAccount.address,
+        fromWallet.publicKey,
+        [],
+        1
+      )
+    );
   };
 
   return (
